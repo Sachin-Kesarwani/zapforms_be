@@ -1,0 +1,76 @@
+
+// Load environment variables from .env file
+require('dotenv').config();
+
+// Import required modules
+const express = require('express');
+const connectDB = require('./connection'); // Import the MongoDB connection
+const cors = require("cors");
+const cluster = require('cluster');
+const os = require('os');
+
+// Get the number of CPU cores
+const numCPUs = os.cpus().length;
+
+if (cluster.isMaster) {
+  // Master process logic
+  console.log(`Master process started. Forking ${numCPUs} workers...`);
+
+  // Fork a worker for each CPU core
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  // Listen for worker exit and replace the worker
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died. Spawning a new worker...`);
+    cluster.fork();
+  });
+  process.on('SIGINT', () => {
+    console.log('Shutting down master...' );
+    for (const id in cluster.workers) {
+      cluster.workers[id].kill();
+    }
+    process.exit(0);
+  });
+ 
+} else {
+  // Worker process logic
+  const app = express();
+
+  // Middleware
+
+  app.use(express.json()); // Parse incoming JSON requests
+  app.use(cors()); // Enable CORS for all routes
+
+  // Connect to MongoDB (only once for each worker with a shared pool)
+
+
+  // Basic route for server health check
+  app.get('/', (req, res) => {
+    res.send(`Welcome to the Node.js, Express, and MongoDB backend! Worker PID: ${process.pid}`);
+  });
+
+  
+  // Start the server for each worker
+  const PORT = process.env.PORT || 5000;
+
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection:', reason);
+    process.exit(1);
+  });
+
+  process.on('SIGINT', () => {
+    console.log(`Worker ${process.pid} shutting down...`);
+    process.exit(0);
+  });
+  app.listen(PORT, () => {
+    connectDB();
+    console.log(`Worker ${process.pid} is running on port ${PORT}`);
+  });
+}
