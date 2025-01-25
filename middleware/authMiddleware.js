@@ -1,7 +1,11 @@
-function signupMiddleware(res, res) {
+const { userModel } = require("../models/userModel");
+
+async function signupMiddleware(req, res , next) {
     const {email=""} = req.body;
+    console.log("inside signup signupMiddleware ")
   try {
-    const user = userModel.findOne({ email });
+    const user = await userModel.findOne({ email });
+    console.log(user)
     if (user) {
       res.status(409).send({
         error: "Conflict",
@@ -12,6 +16,7 @@ function signupMiddleware(res, res) {
     }
     next();
   } catch (error) {
+    console.log(error)
     res.status(400).send({
       message: "Someting went wrong",
     });

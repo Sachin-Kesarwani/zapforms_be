@@ -8,6 +8,7 @@ const connectDB = require('./connection'); // Import the MongoDB connection
 const cors = require("cors");
 const cluster = require('cluster');
 const os = require('os');
+const authRouter = require('./routes/authRoute');
 
 // Get the number of CPU cores
 const numCPUs = os.cpus().length;
@@ -42,11 +43,8 @@ if (cluster.isMaster) {
 
   app.use(express.json()); // Parse incoming JSON requests
   app.use(cors()); // Enable CORS for all routes
-
-  // Connect to MongoDB (only once for each worker with a shared pool)
-
-
   // Basic route for server health check
+  app.use("/auth",authRouter)
   app.get('/', (req, res) => {
     res.send(`Welcome to the Node.js, Express, and MongoDB backend! Worker PID: ${process.pid}`);
   });

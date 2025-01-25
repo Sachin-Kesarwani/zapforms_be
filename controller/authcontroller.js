@@ -1,16 +1,18 @@
 const { userModel } = require("../models/userModel");
+const jwtService = require("../utils/jwt");
 
 
 
-function signup(req,res){
+async function signup(req,res){
     const {email,username} = req.body;
     try {
         const newUser = new userModel({email,username})
-        const userData = newUser.save()
-        const token=jwtService.signToken(userData)
+        const userData = await newUser.save()
+        console.log(userData , 11)
+        const token=await jwtService.signToken(userData.toObject())
         res.status(200).send(token)
     } catch (error) {
-        
+        console.log(error)
     }
 }
 
