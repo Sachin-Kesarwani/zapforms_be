@@ -9,6 +9,8 @@ const cors = require("cors");
 const cluster = require('cluster');
 const os = require('os');
 const authRouter = require('./routes/authRoute');
+const cron = require("node-cron");
+const startCronJob = require('./services/cron.service');
 
 // Get the number of CPU cores
 const numCPUs = os.cpus().length;
@@ -69,6 +71,7 @@ if (cluster.isMaster) {
   });
   app.listen(PORT, () => {
     connectDB();
+    startCronJob()
     console.log(`Worker ${process.pid} is running on port ${PORT}`);
   });
 }
