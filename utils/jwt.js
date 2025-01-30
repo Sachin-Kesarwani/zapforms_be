@@ -14,7 +14,6 @@ const jwtService = {
    */
   signToken: async (payload, expiresIn = JWT_EXPIRATION) => {
     try {
-      console.log(payload)
       return jwt.sign(payload, JWT_SECRET, { expiresIn });
     } catch (error) {
       console.error('Error signing token:', error);

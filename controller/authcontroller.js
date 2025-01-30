@@ -12,8 +12,7 @@ async function signup(req, res) {
     const otp = await saveOtpandsendOtp({ email, username });
     res.status(200).send({ message: "Verification sent", otp });
   } catch (error) {
-    console.log(error);
-    res.status(400).send({ message: "Smething wen wrong" });
+    res.status(500).send({ message: "Smething wen wrong" });
   }
 }
 
@@ -25,7 +24,7 @@ async function login(req, res) {
     const otp = await saveOtpandsendOtp({ email, username });
     res.status(200).send({ message: "Verification sent", otp });
   } catch (error) {
-    res.status(400).send({ message: "Smething wen wrong" });
+    res.status(500).send({ message: "Smething wen wrong" });
   }
 }
 
@@ -47,7 +46,7 @@ async function verifyOtp(req, res) {
       res.status(404).send({ message: "Invalid OTP. Please try again." });
     }
   } catch (error) {
-    res.status(400).send({ message: "Smething wen wrong" });
+    res.status(500).send({ message: "Smething wen wrong" });
   }
 }
 

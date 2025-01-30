@@ -1,12 +1,13 @@
 const { v4: uuidv4 } = require('uuid'); // Use UUID for unique ID generation
+const { currentTimeInSeconds } = require('.');
 
 function customPluginInModels(schema) {
   // Add a custom `id` field
   schema.add({
-    id: {
+    createdAt: {
       type: String,
       unique: true,
-      default: uuidv4, // Auto-generate a UUID
+      default: currentTimeInSeconds, // Auto-generate a UUID
     },
   });
 

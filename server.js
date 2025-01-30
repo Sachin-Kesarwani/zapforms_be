@@ -11,6 +11,7 @@ const os = require('os');
 const authRouter = require('./routes/authRoute');
 const cron = require("node-cron");
 const startCronJob = require('./services/cron.service');
+const { createformRouter } = require('./routes/formRoute');
 
 // Get the number of CPU cores
 const numCPUs = os.cpus().length;
@@ -18,7 +19,6 @@ const numCPUs = os.cpus().length;
 if (cluster.isMaster) {
   // Master process logic
   console.log(`Master process started. Forking ${numCPUs} workers...`);
-
   // Fork a worker for each CPU core
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
@@ -45,12 +45,13 @@ if (cluster.isMaster) {
 
   app.use(express.json()); // Parse incoming JSON requests
   app.use(cors()); // Enable CORS for all routes
-  // Basic route for server health check
-  app.use("/auth",authRouter)
+
   app.get('/', (req, res) => {
     res.send(`Welcome to the Node.js, Express, and MongoDB backend! Worker PID: ${process.pid}`);
   });
-
+    // Basic route for server health check
+  app.use("/auth",authRouter)
+  app.use("/form",createformRouter)
   
   // Start the server for each worker
   const PORT = process.env.PORT || 5000;
