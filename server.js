@@ -46,8 +46,8 @@ if (cluster.isMaster) {
   app.use(express.json()); // Parse incoming JSON requests
   app.use(cors()); // Enable CORS for all routes
 
-  app.get('/', (req, res) => {
-    res.send(`Welcome to the Node.js, Express, and MongoDB backend! Worker PID: ${process.pid}`);
+  app.get('/', (req , res)=>{
+    res.send("hello world")
   });
     // Basic route for server health check
   app.use("/auth",authRouter)

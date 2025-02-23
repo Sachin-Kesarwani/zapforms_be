@@ -17,13 +17,15 @@ async function signup(req, res) {
 }
 
 async function login(req, res) {
-  const { email } = req.body;
+  const { email  , redirectTo} = req.body;
   try {
     const user = await userModel.findOne({ email });
     const { username } = user;
-    const otp = await saveOtpandsendOtp({ email, username });
+    const otp = await saveOtpandsendOtp({ email, username , redirectTo });
     res.status(200).send({ message: "Verification sent", otp });
   } catch (error) {
+    console.log(error)
+
     res.status(500).send({ message: "Smething wen wrong" });
   }
 }
@@ -40,26 +42,27 @@ async function verifyOtp(req, res) {
           { username: 1, email: 1, _id: 1 } // Include only username, email, and _id
         )
         .lean(); // Use lean() to get a plain object
-      const token = await jwtService.signToken(userData);
+      const token = await jwtService.signToken(userData);  
       res.status(200).send({ token, message: "Succesfully otp verified" });
     } else {
       res.status(404).send({ message: "Invalid OTP. Please try again." });
     }
   } catch (error) {
+    console.log(error)
     res.status(500).send({ message: "Smething wen wrong" });
   }
 }
 
-async function saveOtpandsendOtp({ email, username }) {
+async function saveOtpandsendOtp({ email, username  , redirectTo}) {
   const isExistOtp = await otpModel.findOne({ email });
   if (!isExistOtp) {
-    const otp = await sendOtpEmail(username, email);
+    const otp = await sendOtpEmail({username, email  , redirectTo});
     let newotp = new otpModel({ email, otp, createdAt: currentTimeInSeconds });
     await newotp.save();
     return otp;
   } else {
     const { otp } = await otpModel.findOne({ email });
-    await sendOtpEmail(username, email, otp);
+    await sendOtpEmail({username, email, otp , redirectTo});
     return otp;
   }
 }

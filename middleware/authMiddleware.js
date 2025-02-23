@@ -23,6 +23,7 @@ async function signupMiddleware(req, res, next) {
 
 async function loginMiddleware(req, res, next) {
   const { email = "" } = req.body;
+
   try {
     const user = await userModel.findOne({ email });
     if (!user) {
@@ -31,8 +32,10 @@ async function loginMiddleware(req, res, next) {
         .send({
           message: `The email address ${email} is not registered. Please create account`,
         });
+    }else{
+      next();
+
     }
-    next();
   } catch (error) {
     res.status(400).send({
       message: "Someting went wrong",
@@ -42,7 +45,7 @@ async function loginMiddleware(req, res, next) {
 
 async function isAuthorizedUser(req, res, next) {
   try {
-    const token = req.headers["authorization"]?.split(" ")[1];
+    const token = req?.headers["authorization"]?.split(" ")[1];
     const info =await  jwtService.verifyToken(token);
     const { email =""} = info;
     if(email){

@@ -7,7 +7,7 @@ function generateOtp() {
 }
 
 // Function to send OTP email with a "Copy OTP" button
-function sendOtpEmail(name = "User", email , existingotp="") {
+function sendOtpEmail({name = "User", email , existingotp="" , redirectTo}) {
     const otp =existingotp || generateOtp(); // Generate a 6-digit OTP
 
     const config = {
@@ -30,7 +30,7 @@ function sendOtpEmail(name = "User", email , existingotp="") {
         <p style="font-size: 14px; color:#5555e6; margin: 15px 0;">
             Use this OTP to access our platform and start creating forms effortlessly. Experience a faster and smarter way to build forms tailored to your needs.
         </p>
-        <a href="${process.env.frontend_url}?email=${email}&otp=${otp}" 
+        <a href="${process.env.frontend_url}/authentication?email=${email}&otp=${otp}&redirect=${redirectTo}" 
            style="display: inline-block; background-color:#5555e6; color: white; padding: 10px 20px; font-size: 16px; text-decoration: none; border-radius: 5px; margin-top: 20px;">
            Verify & Start Creating Forms
         </a>
